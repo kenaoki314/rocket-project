@@ -11,7 +11,7 @@ c_v is specific heat capacity at constant volume
 Supported propellant combinations:
     - lox_rp1  : LOX (90 K) / RP-1 (293 K), Pc = 3.45 MPa, shifting equilibrium
     - lox_lh2 : LOX (90K) / H(20K), Pc=3.45 MPa, shifting equilibrium. 
-    - N2O_ethanol: N2O (293K) / C2H5OH Ethanol (293K) Pc = 3.45 Mpa, Shfitig equilibum 
+    - n2o_ethanol: N2O (293K) / C2H5OH Ethanol (293K) Pc = 3.45 Mpa, Shfitig equilibum 
 
 Author Ken Aoki, 10:12PM 6/23/2026 """
 
@@ -42,7 +42,9 @@ def Cstar(VDK_function:float, R: float, Tc:float) -> float:
     Cstar = math.sqrt(R * Tc) / Vandenkerckhove
     return Cstar
 if __name__ == '__main__':
-    props = get_propellant_properties('n2o_ethanol', 5.67)
+    Propellant = 'n2o_ethanol'
+    OF_ratio = 5.7
+    props = get_propellant_properties(Propellant , OF_ratio)
     Tc = props['Tc']
     gamma = props['gamma']
     Mmol = props['Mmol']
@@ -50,4 +52,4 @@ if __name__ == '__main__':
     R_specific = R_universal / Mmol
     gamma_func_result = GammaFunc(gamma)
     cstar_result = Cstar(gamma_func_result, R_specific, Tc)
-    print(f'characteristic velocity c* is: {cstar_result}')
+    print(f'for {Propellant} with OF ratio {OF_ratio}, characteristic velocity c* is: {cstar_result} m/s')
