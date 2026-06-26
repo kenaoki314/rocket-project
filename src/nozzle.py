@@ -15,7 +15,7 @@ gamma: heat capacity ratio [none]
 M: Mach number 
 
 exhaust velocity c = Isp *g0 = F / mdot [m/s]
-Throat area Ac = F / (C_f * P_c) [m^2]
+Throat area At = F / (C_f * P_c) [m^2]
 
 Diverging bell curve:
 A / A_t = 1/M * [(2+(gamma-1)M^2) / (gamma + 1)]^((gamma+1)/2(gamma-1))
@@ -24,5 +24,83 @@ P_exit = P_c * (1+ (gamma -1)/2 * M_exit^2)^(-gamma / (gamma -1))
 T_exit = T_c * (1+(gamma-1)/2 * M_exit^2)^-1
 V_exit
 """ 
+import math
+from scipy.optimize import brentq
 
-print("hello world")
+
+def mach_from_area_ratio(epsilon:float, gamma: float)-> float: 
+    """return exit mach number for a given area ratio
+    solve mach area equation using bentq
+    A/A* = (1/M) * [(2 + (gamma-1)*M^2) / (gamma+1)]^((gamma+1) / 2(gamma-1))
+    args: 
+    epsilon: area ratio A/A* unitlless
+    gamma: specific heat ratio unitles
+    returns: 
+    Me: exit mach number 
+   """
+    def f(M):
+        rhs = (1/M) * ((2+ (gamma-1) * M**2) / (gamma + 1))**((gamma+1) / (2*(gamma-1)))
+        return epsilon - rhs
+    Me = brentq(f,1.0, 10.0)
+    return Me
+
+def temperature_exit(gamma: float, Tc: float, M: float) -> float: 
+    """Governing equation:
+    Te = Tc * (1 + (gamma-1)/2 * M^2)^-1
+
+    Args:
+    Tc:    chamber temperature [K]
+    gamma: ratio of specific heats [-]
+    M:     exit Mach number [-]
+    Returns:
+    Te: exit temperature [K]
+    """
+    Te = Tc * (1 + (gamma - 1)/2 * M**2)**-1
+    return Te
+
+def pressure_exit(gamma: float, Pc: float, M: float) -> float: 
+    """calcualte the pressure at the exit as a function of the pressure in the chamber, gamma ratio, and the mach number
+    Pe = Pc * (1 + (gamma -1)/2 * M**2)**((gamma * -1)/(gamma - 1)) 
+    Args: 
+    Pc: chamber prssure [Pa]
+    gamma: specific heat ratio 
+    M: exit mach number
+    returns: exit pressure [Pa]"""
+    
+    
+    Pe = Pc * (1 + (gamma -1)/2 * M**2)**((gamma * -1)/(gamma - 1))
+    return Pe 
+
+
+def velocity_exit(Me: float, gamma: float, R_specific: float, Te) -> float: 
+    """calculate the velocity of propellant as it exits nozzle,
+    a_exit = sqrt(gamma * R_specifc * Te)
+    V_exit = M_exit * a_exit
+    Args: 
+    M: exit mach number 
+    Rsp: specific idea gas constant 
+    Te: temperature of gas at exit [K]
+    gamma: specific heat ratio 
+    returns
+    Ve: velocity at exit """
+    a_exit = math.sqrt(gamma * R_specific * Te)
+    Ve = Me * a_exit 
+    return Ve 
+
+def exit_conditions(Pc: float, Tc: float, gamma: float, Me: float, Mmol:float) -> tuple: 
+    """returns exit conditions of pressure, temperature, and velocity
+    args: 
+    Pc: chamber prssure Pa]
+    Tc: chamber temperature [K]
+    gamma: specific heat ratio 
+    Me: exit mach number 
+    Mmol: molar mass kg/mol
+    Returns:
+    Pe: exit pressure [Pa]
+    Te: exit temperature [K]
+    Ve: exit velocity [m/s] """
+    R_specific = 8.314 / Mmol
+    Te = temperature_exit(gamma, Tc, Me)
+    Pe = pressure_exit(gamma, Pc, Me)
+    Ve = velocity_exit(Me, gamma, R_specific, Te)
+    return Pe, Te, Ve
