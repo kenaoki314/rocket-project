@@ -140,4 +140,24 @@ def throat_area(thrust: float ,Cf: float, Pc: float) -> float:
     At = thrust /(Pc * Cf)
     return At 
 
-    
+def nozzle_geometry(At: float, Ac: float, Ae: float,theta_conv: float = 30, theta_div: float = 15) -> dict:
+    """calculatrs the Lengths of the convering section, divering section, radius of throat, radius of the exit,and radius of the chamber 
+    Args: 
+    At: area of throat [m^2]
+    Ac: area of chamber [m^2]
+    Ae: area of exit [m^2]
+    theta_conv: angle between wall and orthogonal line to center of area of chamber on inlet side of throat [deg]
+    theta_div: angle between wall and orthognal line to center of area of exit on exitr side of throat [deg] 
+    Returns: 
+    Ldiv,
+    Lconv
+    Rt 
+    Re
+    Rc"""
+    Rt = math.sqrt( At / math.pi) 
+    Re = math.sqrt( Ae / math.pi)  
+    Rc = math.sqrt( Ac / math.pi)
+    L_div = (Re - Rt) / math.tan(math.radians(theta_div)) 
+    L_conv = (Rc - Rt) / math.tan(math.radians(theta_conv)) 
+    return {'L_div': L_div, 'L_conv': L_conv, 'Rt': Rt, 'Re': Re, 'Rc': Rc } 
+
