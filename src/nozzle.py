@@ -23,6 +23,16 @@ A / A_t = 1/M * [(2+(gamma-1)M^2) / (gamma + 1)]^((gamma+1)/2(gamma-1))
 P_exit = P_c * (1+ (gamma -1)/2 * M_exit^2)^(-gamma / (gamma -1))
 T_exit = T_c * (1+(gamma-1)/2 * M_exit^2)^-1
 V_exit
+
+
+
+
+
+brentq solver on supersonic branch for Area ratio for diverging section of nozzle 
+exit area epsilon * At 
+momentum + pressure thust 
+At = F/(Cf*Pc)
+convegent and divergent lengths and radii
 """ 
 import math
 from scipy.optimize import brentq
